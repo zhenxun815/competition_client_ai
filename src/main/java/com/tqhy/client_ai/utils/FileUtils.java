@@ -1,6 +1,5 @@
 package com.tqhy.client_ai.utils;
 
-import com.tqhy.client.models.entity.OriginData;
 import com.tqhy.client_ai.models.entity.OriginData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

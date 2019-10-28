@@ -1,7 +1,7 @@
 package com.tqhy.client_ai;
 
-import com.tqhy.client.jna.GlobalKeyListener;
-import com.tqhy.client.utils.FXMLUtils;
+import com.tqhy.client_ai.jna.GlobalKeyListener;
+import com.tqhy.client_ai.utils.FXMLUtils;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Rectangle2D;
