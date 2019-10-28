@@ -6,7 +6,7 @@
 <?import javafx.scene.text.Text?>
 <AnchorPane styleClass="window_root" stylesheets="@../css/fx_warnning_onclose.css"
             xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.tqhy.client.controllers.WarningOnCloseController">
+            fx:controller="com.tqhy.client_ai.controllers.WarningOnCloseController">
 
     <VBox fx:id="base_pane" styleClass="base_pane" minWidth="600" minHeight="228">
         <children>

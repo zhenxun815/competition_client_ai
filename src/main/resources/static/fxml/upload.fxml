@@ -8,7 +8,7 @@
 <?import javafx.scene.text.*?>
 <AnchorPane styleClass="window_root" stylesheets="@../css/fx_upload_pane.css"
             xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.tqhy.client.controllers.UploadFileController">
+            fx:controller="com.tqhy.client_ai.controllers.UploadFileController">
     <!--  prefHeight="268.0"
              prefWidth="620.0"
              style="-fx-background-color: transparent;-fx-padding: 10px"

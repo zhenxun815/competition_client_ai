@@ -6,7 +6,7 @@
 <?import javafx.scene.text.Text?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.tqhy.client.controllers.PreloaderController"
+            fx:controller="com.tqhy.client_ai.controllers.PreloaderController"
             stylesheets="@../css/fx_preloader.css"
             prefHeight="360.0" prefWidth="700.0" style="-fx-background-color: transparent;-fx-padding: 10px">
 
