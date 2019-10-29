@@ -1,19 +1,15 @@
 package com.tqhy.client_ai.utils;
 
 import com.tqhy.client_ai.config.Constants;
-import com.tqhy.client_ai.models.msg.BaseMsg;
-import com.tqhy.client_ai.models.msg.server.ClientMsg;
 import com.tqhy.client_ai.network.Network;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -112,7 +108,7 @@ public class NetworkUtils {
         }
 
         Network.setServerBaseUrl(serverIP);
-        try {
+       /* try {
             ResponseBody body = Network.getAicApi()
                                        .pingServer()
                                        .execute()
@@ -126,7 +122,7 @@ public class NetworkUtils {
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
         return "";
     }
 
