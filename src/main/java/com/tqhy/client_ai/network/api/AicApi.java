@@ -1,5 +1,6 @@
 package com.tqhy.client_ai.network.api;
 
+import com.tqhy.client_ai.models.entity.Case;
 import io.reactivex.Observable;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -101,11 +102,12 @@ public interface AicApi {
     /**
      * 获取病例信息
      *
-     * @param caseId
+     * @param caseJson
      * @return
      */
-    @POST("searchCase")
-    Observable<ResponseBody> searchCase(@Query("caseNo") String caseId);
+    @POST("/answer/upcase")
+    @Headers({"Content-type: application/json", "Accept: */*"})
+    Observable<ResponseBody>  postOriginDatas(@Body List<Case> caseJson);
 
     /**
      * 通知后台删除无效批次
