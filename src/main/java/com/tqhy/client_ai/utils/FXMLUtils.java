@@ -63,7 +63,10 @@ public class FXMLUtils {
     public static Stage loadPopWindow(String url) {
         Stage stage = new Stage();
         stage.setResizable(false);
+        Rectangle2D visualBounds = Screen.getPrimary().getBounds();
         stage.initStyle(StageStyle.TRANSPARENT);
+        stage.setX(visualBounds.getMinX());
+        stage.setY(visualBounds.getMinY());
         return loadWindow(stage, url, true);
     }
 
@@ -120,7 +123,7 @@ public class FXMLUtils {
     public static void loadScene(Stage stage, Parent parentNode, boolean fullScreen) {
         Scene scene = null;
         if (fullScreen) {
-            Rectangle2D visualBounds = Screen.getPrimary().getVisualBounds();
+            Rectangle2D visualBounds = Screen.getPrimary().getBounds();
             double visualWidth = visualBounds.getWidth();
             double visualHeight = visualBounds.getHeight();
             scene = new Scene(parentNode, visualWidth, visualHeight, Color.TRANSPARENT);
@@ -157,7 +160,7 @@ public class FXMLUtils {
      * @param pane
      */
     public static void center2Display(Pane pane) {
-        Rectangle2D visualBounds = Screen.getPrimary().getVisualBounds();
+        Rectangle2D visualBounds = Screen.getPrimary().getBounds();
         double visualWidth = visualBounds.getWidth();
         double visualHeight = visualBounds.getHeight();
 

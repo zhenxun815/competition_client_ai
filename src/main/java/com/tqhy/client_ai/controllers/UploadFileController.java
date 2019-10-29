@@ -1,13 +1,17 @@
 package com.tqhy.client_ai.controllers;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.tqhy.client_ai.ClientApplication;
 import com.tqhy.client_ai.config.Constants;
+import com.tqhy.client_ai.models.entity.Case;
 import com.tqhy.client_ai.models.msg.local.UploadMsg;
 import com.tqhy.client_ai.network.Network;
 import com.tqhy.client_ai.task.DcmTransWorkerTask;
 import com.tqhy.client_ai.utils.FXMLUtils;
 import com.tqhy.client_ai.utils.FileUtils;
 import com.tqhy.client_ai.utils.PropertyUtils;
+import io.reactivex.schedulers.Schedulers;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -40,6 +44,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -158,14 +163,16 @@ public class UploadFileController {
         stage.setResizable(false);
         stage.initStyle(StageStyle.TRANSPARENT);
         stage.setAlwaysOnTop(true);
-        Rectangle2D visualBounds = Screen.getPrimary().getVisualBounds();
+        Rectangle2D bounds = Screen.getPrimary().getBounds();
 
-        stage.setWidth(visualBounds.getWidth());
-        stage.setHeight(visualBounds.getHeight());
+        stage.setWidth(bounds.getWidth());
+        stage.setHeight(bounds.getHeight());
+        stage.setX(bounds.getMinX());
+        stage.setY(bounds.getMinY());
 
-        btn_upload_min.setLayoutX(visualBounds.getWidth() - 50);
+        btn_upload_min.setLayoutX(bounds.getWidth() - 50);
         btn_upload_min.setLayoutY(16);
-        stage.centerOnScreen();
+
         panels = new VBox[]{panel_choose, panel_progress, panel_fail, panel_complete};
         showPanel(panel_choose.getId());
 
@@ -359,8 +366,21 @@ public class UploadFileController {
         MouseButton button = mouseEvent.getButton();
         if (MouseButton.PRIMARY.equals(button)) {
             logger.info("into start mark...");
-            landingController.startMark();
+            //landingController.startMark();
             resetValues();
+            List<Case> cases = new Gson().fromJson(caseJson, new TypeToken<List<Case>>() {
+            }.getType());
+            Network.getAicApi()
+                   .postOriginDatas(cases)
+                   .observeOn(Schedulers.io())
+                   .subscribeOn(Schedulers.trampoline())
+                   .blockingSubscribe(responseBody -> {
+                       String json = responseBody.string();
+                       Map<String, Object> resMap = new Gson().fromJson(json, Map.class);
+                       Double flag = (Double) resMap.get("flag");
+                       logger.info("upload origin data res flag is {}", flag);
+                       landingController.jump2Index();
+                   });
             stage.hide();
         }
     }
@@ -414,6 +434,21 @@ public class UploadFileController {
         });
     }
 
+/*
+    @PostMapping("/answer/upcase")
+    @ResponseBody
+    public Map<String, String> upcase(@RequestBody String caseJson) {
+        logger.info("get requst josn is {}", caseJson);
+        List<Case> cases = new Gson().fromJson(caseJson, new TypeToken<List<Case>>() {
+        }.getType());
+        for (Case aCase : cases) {
+            logger.info("case is: {}", aCase.getCaseName());
+        }
+        HashMap<String, String> map = new HashMap<>();
+        map.put("des", "get");
+        return map;
+    }*/
+
     @GetMapping("/originA")
     @ResponseBody
     public Map<String, String> getOriginA() throws IOException {
@@ -426,6 +461,7 @@ public class UploadFileController {
         map.put("caseJson", caseJson);
         return map;
     }
+
 
     @GetMapping(value = "/viewImg")
     public void viewImg(HttpServletRequest req, HttpServletResponse res) {

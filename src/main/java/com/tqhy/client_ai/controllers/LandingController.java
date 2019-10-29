@@ -34,11 +34,8 @@ public class LandingController extends BaseWebviewController {
     @FXML
     private WebView webView;
 
-    @Value("${network.url.connection:''}")
-    private String connectionUrl;
-
-    @Value("${network.url.mark:''}")
-    private String markUrl;
+    @Value("${network.url.index:''}")
+    private String indexUrl;
 
     @Value("${network.url.landing:''}")
     private String landingUrl;
@@ -54,9 +51,14 @@ public class LandingController extends BaseWebviewController {
     private boolean landingIgnore;
 
 
-    public void startMark() {
-        logger.info("load ai case ing index page..., {}", markUrl);
-        loadPage(webView, Network.LOCAL_BASE_URL + markUrl);
+    public void jump2Index() {
+        logger.info("load ai case ing index page..., {}", indexUrl);
+        loadPage(webView, Network.SERVER_BASE_URL + indexUrl);
+    }
+
+    public void jump2Baidu() {
+        logger.info("load ai case ing index page..., {}", indexUrl);
+        loadPage(webView, Network.TEST_URL);
     }
 
     @FXML
