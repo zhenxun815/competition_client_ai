@@ -416,8 +416,8 @@ public class FileUtils {
         String imageAbsPath = file.getAbsolutePath().replaceAll("\\\\", "/");
         logger.info("start get origin data {}", imageAbsPath);
 
-        String appPath = FileUtils.getAppPath();
-        String imageRelPath = imageAbsPath.replace(appPath, "");
+        String basePath = PropertyUtils.getProperty("jpgDir");
+        String imageRelPath = imageAbsPath.replace(basePath, "");
         //logger.info("appPath is {}", appPath);
         //logger.info("imageRelPath is {}", imageRelPath);
         String imgId = getFileMD5(file);

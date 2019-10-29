@@ -1,12 +1,12 @@
 package com.tqhy.client_ai.task;
 
 import com.google.gson.Gson;
-import com.tqhy.client_ai.config.Constants;
 import com.tqhy.client_ai.models.entity.Case;
 import com.tqhy.client_ai.models.entity.OriginData;
 import com.tqhy.client_ai.utils.Dcm2JpgUtil;
 import com.tqhy.client_ai.utils.FileUtils;
 import com.tqhy.client_ai.utils.PrimaryKeyUtil;
+import com.tqhy.client_ai.utils.PropertyUtils;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Task;
@@ -70,12 +70,12 @@ public class DcmTransWorkerTask extends Task {
 
     private List<Case> prepareTask() {
         uploadInfoFile = FileUtils.getLocalFile(localDataPath, batchNumber + ".txt");
-        String appPath = FileUtils.getAppPath();
-        jpgDir = new File(appPath, Constants.PATH_TEMP_JPG);
-        if (jpgDir.exists()) {
-            FileUtils.deleteDir(jpgDir);
+        String jpgDirPath = PropertyUtils.getProperty("jpgDir");
+        this.jpgDir = new File(jpgDirPath);
+        if (this.jpgDir.exists()) {
+            FileUtils.deleteDir(this.jpgDir);
         }
-        jpgDir.mkdirs();
+        this.jpgDir.mkdirs();
 
         originCases = collectAll(dirToUpload);
         return originCases;
@@ -125,7 +125,6 @@ public class DcmTransWorkerTask extends Task {
             }
             cases.add(Case.of(caseId, caseDirName, originDatas));
         }
-
 
         return cases;
     }
