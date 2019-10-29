@@ -37,7 +37,7 @@ public class GlobalKeyListener implements NativeKeyListener {
         }
         if (ctrlPressed && qPressed) {
             logger.info("shot key fired...");
-            Platform.runLater(() -> FXMLUtils.loadChooseModel("/static/fxml/choose_model.fxml"));
+            Platform.runLater(() -> FXMLUtils.loadPopWindow("/static/fxml/warning_onclose.fxml"));
         }
     }
 
