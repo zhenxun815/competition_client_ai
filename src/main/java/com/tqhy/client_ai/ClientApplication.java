@@ -17,8 +17,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.net.URL;
 import java.util.logging.Level;
@@ -91,41 +89,6 @@ public class ClientApplication extends Application {
             java.awt.Image image = ImageIO.read(imageLoc);
             //final TrayIcon trayIcon = new TrayIcon(image, "打开悬浮窗",popupMenu);
             final TrayIcon trayIcon = new TrayIcon(image);
-
-            trayIcon.addMouseListener(new MouseListener() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    if (e.getButton() > 1) {
-                        logger.info("button 2 clicked...");
-                        Platform.runLater(
-                                () -> FXMLUtils.loadMenu("/static/fxml/menu.fxml",
-                                                         e.getX() + 0D,
-                                                         e.getY() + 0D,
-                                                         60,
-                                                         100));
-                    }
-                }
-
-                @Override
-                public void mousePressed(MouseEvent e) {
-
-                }
-
-                @Override
-                public void mouseReleased(MouseEvent e) {
-
-                }
-
-                @Override
-                public void mouseEntered(MouseEvent e) {
-
-                }
-
-                @Override
-                public void mouseExited(MouseEvent e) {
-                    Platform.runLater(() -> menuStage.hide());
-                }
-            });
             systemTray.add(trayIcon);
 
 
