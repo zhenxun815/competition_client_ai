@@ -7,6 +7,7 @@ import javafx.application.Platform;
 import javafx.geometry.Rectangle2D;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.slf4j.Logger;
@@ -54,7 +55,8 @@ public class ClientApplication extends Application {
      */
     private void initPrimaryStageSize() {
 
-        Rectangle2D visualBounds = Screen.getPrimary().getVisualBounds();
+        Rectangle2D visualBounds = Screen.getPrimary().getBounds();
+        stage.initStyle(StageStyle.TRANSPARENT);
         stage.setX(visualBounds.getMinX());
         stage.setY(visualBounds.getMinY());
         logger.info("stage: x {}, y {}", stage.getX(), stage.getY());

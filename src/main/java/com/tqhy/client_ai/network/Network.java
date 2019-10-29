@@ -23,7 +23,7 @@ public class Network {
     private static Converter.Factory gsonConverterFactory = GsonConverterFactory.create();
     private static CallAdapter.Factory rxJavaCallAdapterFactory = RxJava2CallAdapterFactory.create();
 
-    public static final String TEST_URL = "http://baidu.com/";
+    public static final String TEST_URL = "https://www.baidu.com/";
     public static String SERVER_IP;
     public static String TOKEN;
     public static String SERVER_BASE_URL = "";
