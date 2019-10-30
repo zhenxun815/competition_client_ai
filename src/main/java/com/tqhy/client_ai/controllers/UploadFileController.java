@@ -1,17 +1,13 @@
 package com.tqhy.client_ai.controllers;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.tqhy.client_ai.ClientApplication;
 import com.tqhy.client_ai.config.Constants;
-import com.tqhy.client_ai.models.entity.Case;
 import com.tqhy.client_ai.models.msg.local.UploadMsg;
 import com.tqhy.client_ai.network.Network;
 import com.tqhy.client_ai.task.DcmTransWorkerTask;
 import com.tqhy.client_ai.utils.FXMLUtils;
 import com.tqhy.client_ai.utils.FileUtils;
 import com.tqhy.client_ai.utils.PropertyUtils;
-import io.reactivex.schedulers.Schedulers;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -44,7 +40,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -368,9 +363,8 @@ public class UploadFileController {
             logger.info("into start mark...");
             //landingController.startMark();
             resetValues();
-            List<Case> cases = new Gson().fromJson(caseJson, new TypeToken<List<Case>>() {
-            }.getType());
-            Network.getAicApi()
+            landingController.jump2Index();
+            /*Network.getAicApi()
                    .postOriginDatas(cases)
                    .observeOn(Schedulers.io())
                    .subscribeOn(Schedulers.trampoline())
@@ -380,7 +374,7 @@ public class UploadFileController {
                        Double flag = (Double) resMap.get("flag");
                        logger.info("upload origin data res flag is {}", flag);
                        landingController.jump2Index();
-                   });
+                   });*/
             stage.hide();
         }
     }
