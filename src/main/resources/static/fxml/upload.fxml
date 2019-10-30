@@ -156,7 +156,7 @@
                             </Text>
                         </HBox>
 
-                        <Button fx:id="btn_success_confirm" onMouseClicked="#startMark" styleClass="btn_confirm">开始标注
+                        <Button fx:id="btn_success_confirm" onMouseClicked="#startMark" styleClass="btn_confirm">进入比赛
                             <VBox.margin>
                                 <Insets>
                                     <top>35</top>
