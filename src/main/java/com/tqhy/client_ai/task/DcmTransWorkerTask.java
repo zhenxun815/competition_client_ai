@@ -1,22 +1,29 @@
 package com.tqhy.client_ai.task;
 
 import com.google.gson.Gson;
+import com.tqhy.client_ai.config.Constants;
 import com.tqhy.client_ai.models.entity.Case;
-import com.tqhy.client_ai.models.entity.OriginData;
-import com.tqhy.client_ai.utils.Dcm2JpgUtil;
-import com.tqhy.client_ai.utils.FileUtils;
-import com.tqhy.client_ai.utils.PrimaryKeyUtil;
-import com.tqhy.client_ai.utils.PropertyUtils;
+import com.tqhy.client_ai.models.msg.server.ClientMsg;
+import com.tqhy.client_ai.network.Network;
+import com.tqhy.client_ai.utils.*;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Task;
 import lombok.*;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Yiheng
@@ -56,6 +63,8 @@ public class DcmTransWorkerTask extends Task {
     File uploadInfoFile;
     private List<Case> originCases;
     private File jpgDir;
+    private int completeCount;
+    private int total2Transform;
 
     @Override
     protected Object call() throws Exception {
@@ -102,28 +111,28 @@ public class DcmTransWorkerTask extends Task {
 
         for (File caseDir : caseDirs) {
             File[] dcmFiles = caseDir.listFiles();
-            int completeCount = 0;
-            int total2Transform = dcmFiles.length;
+            completeCount = 0;
+            total2Transform = dcmFiles.length;
             String caseDirName = caseDir.getName();
-            String caseId = PrimaryKeyUtil.getMd5(caseDirName);
-            File destJpgDir = new File(jpgDir, caseId);
+            File destJpgDir = new File(jpgDir, caseDirName);
             if (!destJpgDir.exists()) {
                 destJpgDir.mkdirs();
             }
-            ArrayList<OriginData> originDatas = new ArrayList<>();
             for (File dcmFile : dcmFiles) {
                 File jpgFile = Dcm2JpgUtil.convert(dcmFile, destJpgDir);
-                completeCount += 1;
-                updateTransImgStatus(completeCount, total2Transform);
+
+                HashMap<String, String> requestParamMap = new HashMap<>();
+                requestParamMap.put("caseName", caseDirName);
                 if (null != jpgFile) {
                     logger.info("convert {} complete...", jpgFile.getAbsolutePath());
-
-                    OriginData originData = FileUtils.getOriginData(jpgFile);
+                    Map<String, RequestBody> requestMap = NetworkUtils.createRequestParamMap(requestParamMap);
+                    //OriginData originData = FileUtils.getOriginData(jpgFile);
+                    doUpLoad(requestMap, jpgFile);
                     //OriginData originData = OriginData.of("tt", 0, 0, "pp");
-                    originDatas.add(originData);
+                    //originDatas.add(originData);
                 }
             }
-            cases.add(Case.of(caseId, caseDirName, originDatas));
+            //cases.add(Case.of(caseId, caseDirName, originDatas));
         }
 
         return cases;
@@ -140,12 +149,78 @@ public class DcmTransWorkerTask extends Task {
         updateProgress(completeCount, total2Transform);
     }
 
+    private void doUpLoad(Map<String, RequestBody> requestParamMap, File fileToUpload) {
+
+        logger.info("start upload file: " + fileToUpload.getAbsolutePath());
+        if (shouldStop()) {
+            logger.info("do upload should stop...");
+            return;
+        }
+        MultipartBody.Part filePart = NetworkUtils.createFilePart("file", fileToUpload.getAbsolutePath());
+        Network.getAicApi().uploadFiles(requestParamMap, filePart)
+               .observeOn(Schedulers.io())
+               .subscribeOn(Schedulers.trampoline())
+               .blockingSubscribe(new UploadObserver(fileToUpload));
+    }
+
     private boolean shouldStop() {
         if (stopUploadFlag.get()) {
             logger.info("should stop..");
             return true;
         }
         return false;
+    }
+
+    private class UploadObserver implements Observer<ResponseBody> {
+        Disposable d;
+        File fileToUpload;
+
+        public UploadObserver(File fileToUpload) {
+            this.fileToUpload = fileToUpload;
+        }
+
+        @Override
+        public void onSubscribe(Disposable d) {
+            logger.info("on subscribe Disposable: " + d);
+            if (shouldStop()) {
+                logger.info("on subscribe should stop {}", d);
+                d.dispose();
+            }
+            this.d = d;
+        }
+
+        @Override
+        public void onNext(ResponseBody responseBody) {
+            ClientMsg clientMsg = GsonUtils.parseResponseToObj(responseBody);
+            Integer flag = clientMsg.getFlag();
+
+            logger.info("upload onnext flag is {}", flag);
+            if (2 == flag) {
+                List<String> msgs = clientMsg.getMsg();
+
+                String failInfo = StringUtils.join(msgs, ",",
+                                                   msg -> "已存在".equals(msg) ? ";1" : msg);
+                String resMsg = fileToUpload.getAbsolutePath().concat(failInfo);
+                logger.info("server get file fail...{}", resMsg);
+                FileUtils.appendFile(uploadInfoFile, resMsg,
+                                     builder -> builder.append(Constants.NEW_LINE), true);
+            }
+        }
+
+        @Override
+        public void onError(Throwable e) {
+            logger.error("upload " + fileToUpload.getAbsolutePath() + " failed", e);
+            completeCount++;
+            updateTransImgStatus(completeCount, total2Transform);
+            FileUtils.appendFile(uploadInfoFile, fileToUpload.getAbsolutePath(),
+                                 builder -> builder.append(Constants.NEW_LINE), true);
+        }
+
+        @Override
+        public void onComplete() {
+            completeCount++;
+            updateTransImgStatus(completeCount, total2Transform);
+        }
     }
 
 }
