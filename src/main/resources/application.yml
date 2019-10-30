@@ -6,7 +6,7 @@ network:
     url:
         landing: html/landing.html
         test: html/test_upload.html
-        mark: index
+        index: index.html
 
 path:
     data: /data/
