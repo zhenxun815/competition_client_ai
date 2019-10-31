@@ -86,9 +86,8 @@ public class Dcm2JpgUtil {
             logger.error("trans dcm error: {}", e.getMessage());
             //e.printStackTrace();
             return null;
-        }finally {
-            return dest;
         }
+        return dest;
     }
 
     /**
@@ -101,7 +100,9 @@ public class Dcm2JpgUtil {
     private static File genJpgFile(File dcmFile, File jpgDir) {
         try (DicomInputStream iis = new DicomInputStream(dcmFile)) {
 
-
+            if (!jpgDir.exists()) {
+                jpgDir.mkdirs();
+            }
             Attributes attributes = iis.readDataset(-1, Tag.PixelData);
             String instanceNum = attributes.getString(Tag.InstanceNumber);
             String patientId = attributes.getString(Tag.PatientID);
@@ -109,9 +110,6 @@ public class Dcm2JpgUtil {
             String destFileName = String.format("%s-%05d.jpg", patientId, Integer.parseInt(instanceNum));
             File destJpgFile = new File(jpgDir, destFileName);
 
-            if (destJpgFile.exists()) {
-                destJpgFile.delete();
-            }
             return destJpgFile;
         } catch (IOException e) {
             logger.error("gen jpg error", e);
