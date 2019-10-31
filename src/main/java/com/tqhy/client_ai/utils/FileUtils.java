@@ -64,37 +64,6 @@ public class FileUtils {
                               HashMap::putAll);
     }
 
-    /**
-     * 获取子文件下所有文件
-     *
-     * @param dir
-     * @return
-     */
-    public static HashMap<File, String> getFilesMapInSubDir(File jpgDir, File dir, Predicate<File> filter,
-                                                            File rootDir) {
-        //logger.info("into get file map in sub dir...");
-
-
-        File[] files = dir.listFiles();
-        if (null == files || files.length == 0) {
-            return new HashMap<>();
-        }
-        return Arrays.stream(files)
-                     .collect(HashMap::new,
-                              (map, file) -> {
-                                  if (filter.test(file)) {
-                                      String caseId = generateCaseName(file);
-                                      File jpgCaseDir = new File(jpgDir, caseId);
-
-                                      if (!jpgCaseDir.exists()) {
-                                          jpgCaseDir.mkdirs();
-                                      }
-                                      Optional<File> jpgFileOpt = transToJpg(file, jpgCaseDir);
-                                      map.put(file, caseId);
-                                  }
-                              },
-                              HashMap::putAll);
-    }
 
 
     public static Optional<File> transToJpg(File fileToTrans, File jpgDir) {
