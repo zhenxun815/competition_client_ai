@@ -107,7 +107,7 @@ public interface AicApi {
      */
     @POST("/answer/upcase")
     @Headers({"Content-type: application/json", "Accept: */*"})
-    Observable<ResponseBody>  postOriginDatas(@Body List<Case> caseJson);
+    Observable<ResponseBody> postOriginDatas(@Body List<Case> caseJson);
 
     /**
      * 通知后台删除无效批次
