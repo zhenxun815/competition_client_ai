@@ -118,6 +118,7 @@ public class DcmTransWorkerTask extends Task {
             if (!destJpgDir.exists()) {
                 destJpgDir.mkdirs();
             }
+            logger.info("start convert case dir #{}#", caseDirName);
             for (File dcmFile : dcmFiles) {
                 File jpgFile = Dcm2JpgUtil.convert(dcmFile, destJpgDir);
 
@@ -132,6 +133,7 @@ public class DcmTransWorkerTask extends Task {
                     //originDatas.add(originData);
                 }
             }
+            logger.info("convert case dir #{}# complete...", caseDirName);
             //cases.add(Case.of(caseId, caseDirName, originDatas));
         }
 
@@ -159,7 +161,7 @@ public class DcmTransWorkerTask extends Task {
         MultipartBody.Part filePart = NetworkUtils.createFilePart("file", fileToUpload.getAbsolutePath());
         Network.getAicApi().uploadFiles(requestParamMap, filePart)
                .observeOn(Schedulers.io())
-               .subscribeOn(Schedulers.trampoline())
+               .subscribeOn(Schedulers.io())
                .blockingSubscribe(new UploadObserver(fileToUpload));
     }
 
