@@ -233,14 +233,14 @@ public class UploadFileController {
      * @param mouseEvent
      */
     @FXML
-    public void startUpload(MouseEvent mouseEvent) throws ExecutionException, InterruptedException {
+    public void startUpload(MouseEvent mouseEvent) throws ExecutionException, InterruptedException, IOException {
         MouseButton button = mouseEvent.getButton();
         if (MouseButton.PRIMARY.equals(button)) {
             logger.info(button.name() + "....");
             if (null == dirToUpload) {
                 return;
             }
-
+            Network.getAicApi().delSubject().execute();
 
             logger.info("dir to upload: {}", dirToUpload.getAbsolutePath());
 

@@ -88,8 +88,8 @@ public interface AicApi {
      *
      * @return
      */
-    @GET("ping")
-    Call<ResponseBody> pingServer();
+    @GET("delsubject")
+    Call<ResponseBody> delSubject();
 
     /**
      * 获取所有模型名称与id
