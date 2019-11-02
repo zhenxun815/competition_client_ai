@@ -20,10 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Yiheng
@@ -65,12 +62,31 @@ public class DcmTransWorkerTask extends Task {
     private File jpgDir;
     private int completeCount;
     private int total2Transform;
+    private Map<File, Map<String, RequestBody>> failedMap;
 
     @Override
     protected Object call() throws Exception {
         logger.info("start upload task...");
-
+        failedMap = new HashMap<>();
         List<Case> cases = prepareTask();
+
+        for (int i = 0; i < 3; i++) {
+            total2Transform = failedMap.size();
+            completeCount = 0;
+            if (failedMap.size() > 0) {
+                Map<File, Map<String, RequestBody>> tmpMap = new HashMap<>();
+                tmpMap.putAll(failedMap);
+                Iterator<Map.Entry<File, Map<String, RequestBody>>> iterator = tmpMap.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    Map.Entry<File, Map<String, RequestBody>> entry = iterator.next();
+                    iterator.remove();
+                    File file2up = entry.getKey();
+                    Map<String, RequestBody> paramMap = entry.getValue();
+                    doUpLoad(paramMap, file2up);
+                }
+
+            }
+        }
         String caseJson = new Gson().toJson(cases);
         String uploadMsg = PROGRESS_MSG_COMPLETE + ";" + caseJson;
         updateMessage(uploadMsg);
@@ -162,7 +178,7 @@ public class DcmTransWorkerTask extends Task {
         Network.getAicApi().uploadFiles(requestParamMap, filePart)
                .observeOn(Schedulers.io())
                .subscribeOn(Schedulers.io())
-               .blockingSubscribe(new UploadObserver(fileToUpload));
+               .blockingSubscribe(new UploadObserver(fileToUpload, requestParamMap));
     }
 
     private boolean shouldStop() {
@@ -176,9 +192,11 @@ public class DcmTransWorkerTask extends Task {
     private class UploadObserver implements Observer<ResponseBody> {
         Disposable d;
         File fileToUpload;
+        Map<String, RequestBody> requestParamMap;
 
-        public UploadObserver(File fileToUpload) {
+        public UploadObserver(File fileToUpload, Map<String, RequestBody> requestParamMap) {
             this.fileToUpload = fileToUpload;
+            this.requestParamMap = requestParamMap;
         }
 
         @Override
@@ -206,6 +224,8 @@ public class DcmTransWorkerTask extends Task {
                 logger.info("server get file fail...{}", resMsg);
                 FileUtils.appendFile(uploadInfoFile, resMsg,
                                      builder -> builder.append(Constants.NEW_LINE), true);
+
+                failedMap.put(fileToUpload, requestParamMap);
             }
         }
 
@@ -216,6 +236,8 @@ public class DcmTransWorkerTask extends Task {
             updateTransImgStatus(completeCount, total2Transform);
             FileUtils.appendFile(uploadInfoFile, fileToUpload.getAbsolutePath(),
                                  builder -> builder.append(Constants.NEW_LINE), true);
+
+            failedMap.put(fileToUpload, requestParamMap);
         }
 
         @Override
