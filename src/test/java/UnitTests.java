@@ -57,7 +57,7 @@ public class UnitTests {
     public void testNet() {
         try {
             ResponseBody responseBody = Network.getAicApi()
-                                               .pingServer()
+                                               .delSubject()
                                                .execute()
                                                .body();
             ClientMsg clientMsg = GsonUtils.parseResponseToObj(responseBody);
