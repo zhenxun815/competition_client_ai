@@ -1,5 +1,5 @@
 server:
-    port: 59527
+    port: 39527
 
 #network
 network:
