@@ -65,6 +65,7 @@ public class LandingController extends BaseWebviewController {
     void initialize() {
         super.initialize(webView);
         loadPage(webView, Network.LOCAL_BASE_URL + landingUrl);
+        //loadPage(webView, Network.SERVER_BASE_URL + indexUrl);
         /*String landingIgnoreConfig = PropertyUtils.getProperty(Constants.LANDING_IGNORE);
 
         landingIgnore = !StringUtils.isEmpty(landingIgnoreConfig) && Boolean.parseBoolean(landingIgnoreConfig);
